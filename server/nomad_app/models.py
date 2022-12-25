@@ -6,3 +6,5 @@ class AppUser(AbstractUser):
         max_length = 255,
         unique = True,
     )
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []

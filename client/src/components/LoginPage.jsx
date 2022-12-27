@@ -23,7 +23,6 @@ export default function LoginPage(props) {
     function login(){
         axios.post(LOGIN_URL, {email: user, password: password})
         .then( response => {
-            console.log(user, password)
             console.log(response.data)
         })
     }

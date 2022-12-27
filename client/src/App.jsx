@@ -36,18 +36,16 @@ function App() {
   const csrftoken = getCookie('csrftoken');
   axios.defaults.headers.common["X-CSRFToken"]=csrftoken
 
-  // logout function saved for later use (works)
+
   function logout () {
     axios.post('/api/logout/')
     .then(response => {
-      console.log(response)
       window.location.reload(false)
     })
   }
   
   function checkUserState() {
     axios.post('/api/isloggedin/').then(response => {
-      console.log(response.data)
       setUser(response.data.IsLoggedIn)
     })
   }
@@ -64,12 +62,15 @@ function App() {
         <a href='/' className='logo'>Nomad</a>
         <ul>
           <li><a href='/'>Home</a></li>
-          <li><Link to='/signup'>Sign up</Link></li>
-          <li><a href='/explore'>Explore</a></li>
-          {user?
-            <li><Button variant='dark' onClick={logout}>Logout</Button></li>
-             :
-            <li><Link to='/login'>Login</Link></li>
+            {user?
+              <li><a href='/explore'>Explore</a></li>
+              :
+              <li><Link to='/signup'>Sign up</Link></li>
+          }
+            {user?
+              <li><Button variant='dark' onClick={logout}>Logout</Button></li>
+              :
+              <li><Link to='/login'>Login</Link></li>
           }
       
         </ul>

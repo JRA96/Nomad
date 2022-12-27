@@ -1,0 +1,9 @@
+.popover {
+    z-index: 100000;
+}
+.combobox-input {
+    width: 100%;
+    padding: 0.5rem;
+    z-index: 150;
+    font-size: small;
+}

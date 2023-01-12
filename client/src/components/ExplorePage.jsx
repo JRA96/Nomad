@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import { useState, useMemo, useCallback, useRef } from "react"
 import Places from './Places'
 import Distance from './Distance'
+import axios from '../api/axios';
 
 import Stars from '../assets/stars.png'
 import Moon from '../assets/moon.png'
@@ -15,7 +16,8 @@ export default function ExplorePage(props) {
     const [userLocation, setUserLocation] = useState()
     const [office, setOffice] = useState()
     const [directions, setDirections] = useState()
-    const [nearbyLocations, setNearbyLocations] = useState()
+    const [clicked, setClicked] = useState(false)
+    // const [nearbyLocations, setNearbyLocations] = useState()
     const mapRef = useRef()
     const center = useMemo(() => ({lat: 43, lng: -80}), [])
     const options = useMemo(() =>({
@@ -38,29 +40,18 @@ export default function ExplorePage(props) {
         (result, status) => {
             if (status ==='OK' && result) {
                 setDirections(result)
+                setClicked(true)
             }
         })
     }
     
-    function nearbySearch(position) {
-        if (!office || !userLocation) {
-            return
+    function saveTrip(){
+        axios.post('/api/savetrip/')
+        .then(response => {
+            console.log(response.data)
+            console.log(office, userLocation)
+          })
         }
-        const service = new google.maps.places.PlacesService()
-        service.nearbySearch({
-            location: office,
-            radius: 10000
-        },
-        (result, status) => {
-            if (status ==='OK' && result) {
-                setNearbyLocations(result)
-                console.log(result)
-            }
-            else{
-                console.log(status)
-            }
-        })
-    }
 
     return (
         
@@ -86,6 +77,14 @@ export default function ExplorePage(props) {
                             fetchDirections(userLocation)
                         }}>Get Directions</Button>
                         {directions && <Distance leg={directions.routes[0].legs[0]}/>}
+                        {clicked?
+                            <Button variant='primary' className='save-button' active onClick={() => {
+                                saveTrip()}}>
+                                Save Trip
+                            </Button>
+                            :
+                            <p></p>
+                        }   
                     </div>
                     <div className='map'>
                     <GoogleMap
@@ -103,6 +102,7 @@ export default function ExplorePage(props) {
                 </LoadScript>
             </div>
         </section>
+        
         
     )
 }

@@ -3,9 +3,10 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.decorators import api_view
 from django.core import serializers
-from .models import AppUser as User
+from .models import AppUser as User, Trips 
 from django.views.decorators.csrf import csrf_exempt
 import json
+from rest_framework.test import APIRequestFactory
 
 # top functions allow reloading of page not conflicting with React Router and URLs
 # request gets sent back to index where React Router takes control
@@ -19,6 +20,9 @@ def sign_up_page(request):
     return HttpResponse(open('static/index.html').read())
 
 def explore_page(request):
+    return HttpResponse(open('static/index.html').read())
+
+def profile_page(request):
     return HttpResponse(open('static/index.html').read())
 
 # all api request will go through these routes below
@@ -64,6 +68,23 @@ def log_out_api(request):
 @api_view(['POST'])
 def is_logged_in_api(request):
     if request.user.is_authenticated:
-        return JsonResponse({'IsLoggedIn': True})
+        print(request)
+        user = str(request.user)
+        list_of_trips = Trips.objects.filter(email = request.user)
+        trip_content = []
+
+        for item in list_of_trips.all().values():
+            trip_content.append({'starting_location': item['starting_location'], 'end_location': item['end_location']})
+        return JsonResponse({'IsLoggedIn': True, 'user': user, 'trip_content': trip_content})
     else:
         return JsonResponse({'IsLoggedIn': False})
+
+@csrf_exempt
+def save_trip(request):
+    if request.user.is_authenticated:
+        factory = APIRequestFactory()
+        req = factory.post('/savetrip')
+        print(request)
+        # new_trip = Trips(email = request.user, starting_location = start_location, end_location = stop_location)
+        # new_trip.save()
+    return JsonResponse({'success': True})

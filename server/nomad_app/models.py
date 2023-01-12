@@ -8,3 +8,8 @@ class AppUser(AbstractUser):
     )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
+class Trips(models.Model):
+    email = models.ForeignKey(AppUser, on_delete=models.CASCADE)
+    starting_location = models.TextField()
+    end_location = models.TextField()

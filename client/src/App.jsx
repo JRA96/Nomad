@@ -4,19 +4,20 @@ import './App.css'
 import Button from 'react-bootstrap/Button';
 import axios from 'axios'
 import {BrowserRouter as Router, Routes, Route, Link} from 'react-router-dom'
-import {useNavigate} from 'react-router-dom'
-import Navbar from 'react-bootstrap/NavBar'
-import Container from 'react-bootstrap/Container'
+
 
 //imports of all component pages
 import HomePage from './components/HomePage'
 import LoginPage from './components/LoginPage'
 import SignUpPage from './components/SignUpPage'
 import ExplorePage from './components/ExplorePage'
+import ProfilePage from './components/ProfilePage'
 
 
 function App() {
   const [user, setUser] = useState(false)
+  const [email, setEmail] = useState()
+  const [savedTrips, setSavedTrips] = useState()
   // Session cookies and axios authentication
   function getCookie(name) {
     let cookieValue = null;
@@ -47,12 +48,14 @@ function App() {
   function checkUserState() {
     axios.post('/api/isloggedin/').then(response => {
       setUser(response.data.IsLoggedIn)
+      setEmail(response.data.user)
+      setSavedTrips(response.data['trip_content'])
     })
   }
 
   useEffect(() => {
     checkUserState()
-  })
+  }, [])
 
   return (
     <div className="App">  
@@ -67,6 +70,11 @@ function App() {
               :
               <li><Link to='/signup'>Sign up</Link></li>
           }
+          {user?
+              <li><a href='/profile'>Account</a></li>
+              :
+              <p></p>
+          }
             {user?
               <li><Button variant='dark' onClick={logout}>Logout</Button></li>
               :
@@ -80,7 +88,8 @@ function App() {
           <Route path=''  element= {<HomePage/>}/>
           <Route path='login/' element= {<LoginPage/>}/>
           <Route path='signup/' element= {<SignUpPage/>}/>
-          <Route path='explore/' element= {<ExplorePage/>}/>
+          <Route path='explore/' element= {<ExplorePage name={email}/>}/>
+          <Route path='profile/' element= {<ProfilePage name={email} trips={savedTrips}/>}/>
         </Routes>
       </Router>
     </div>
